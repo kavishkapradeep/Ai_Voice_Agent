@@ -18,3 +18,15 @@ export const ExpertsList =[
         ,icon:'/meditation.png'
     }
 ]
+
+export const CoachingExpert =[
+    {name:'Joanna',
+        avatar:'/t1.avif'
+    },
+    {name:'Sallie',
+        avatar:'/t2.jpg'
+    },
+    {name:'Micheal',
+        avatar:'/t3.jpg'
+    },
+]

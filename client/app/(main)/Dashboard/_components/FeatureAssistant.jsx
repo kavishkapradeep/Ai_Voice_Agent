@@ -5,6 +5,7 @@ import { ExpertsList } from "@/services/Option";
 import { useUser } from "@stackframe/stack";
 import Image from "next/image";
 import React from "react";
+import UserinputDialog from "./UserinputDialog";
 
 function FeatureAssistant() {
   const user = useUser();
@@ -23,8 +24,12 @@ function FeatureAssistant() {
         {ExpertsList.map((option,index)=>(
           <BlurFade key={option.icon} delay={0.25+index*0.05} inView>
           <div key={index} className="p-3 bg-secondary rounded-3xl flex flex-col justify-center items-center">
+            <UserinputDialog coachingOption={option}>
+          <div key={index} className=" flex flex-col justify-center items-center">
               <Image src={option.icon} alt={option.name} width={150} height={150} className='h-[70px] w-[70px] hover:rotate-12 cursor-pointer transition-all ' ></Image>
             <h2 className=" mt-2 font-bold text-lg">{option.name}</h2>
+          </div>
+          </UserinputDialog>
           </div>
           </BlurFade>
         ))
