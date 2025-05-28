@@ -4,12 +4,9 @@ import { api } from "@/convex/_generated/api";
 import { CoachingExpert } from "@/services/Option";
 import { UserButton } from "@stackframe/stack";
 import { useQueries, useQuery } from "convex/react";
-import { time } from "motion";
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
-import RecordRTC from 'recordrtc';
 
 //const RecordRTC = dynamic(() => import("recordrtc"), { ssr: false });
 function DiscussionRoom() {
@@ -23,6 +20,11 @@ function DiscussionRoom() {
 
 
   const [transcript,setTranscript] = useState('');
+
+   const deepgramSocket = useRef(null);
+  const processorRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const micStreamRef = useRef(null)
 
   let silenceTimeout;
   useEffect(() => {
@@ -39,44 +41,84 @@ function DiscussionRoom() {
     setEnableMic(true);
 
     const apiKey = process.env.NEXT_PUBLIC_DEEPGRAM_API_KEY;
-    const socket = `wss://api.deepgram.com/v1/listen?punctuate=true&language=en-US&encoding=linear16&sample_rate=16000`;
+    const socketUrl = `wss://api.deepgram.com/v1/listen?punctuate=true&language=en-US&encoding=linear16&sample_rate=16000`;
+    const socket = new  WebSocket(socketUrl,['token',apiKey])
+
+deepgramSocket.current  = socket;
+
+socket.onopen = async () => {
+   const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+   micStreamRef.current = stream;
+   const audioContext = new  AudioContext({sampleRate:16000})
+   audioContextRef.current  =audioContext;
+
+   const source = audioContext.createMediaStreamSource(stream);
+   const processor = audioContext.createScriptProcessor(4096,1,1)
+   processorRef.current = processor
+
+   source.connect(processor)
+   processor.connect(audioContext.destination)
+
+   processor.onaudioprocess = (e) =>{
+    const input = e.inputBuffer.getChannelData(0)
+    const buffer = new ArrayBuffer(input.length *2)
+
     
+    const view = new DataView(buffer)
 
 
-    if (typeof window !== "undefined" && typeof navigator !== "undefined") {
-      navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then((stream) => {
-          recorder.current = new MediaRecorder(stream, {
-            type: "audio",
-            mimeType: "audio/webm;codecs=pcm",
-    timeSlice: 250,
-            desiredSampRate: 16000,
-            numberOfAudioChannels: 1,
-            bufferSize: 4096,
-            audioBitsPerSecond: 128000,
-            ondataavailable: async (blob) => {
-              // if (!realtimeTranscriber.current) return;
-              clearTimeout(silenceTimeout);
-              const buffer = await blob.arrayBuffer();
-              console.log(buffer);
-
-              silenceTimeout = setTimeout(() => {
-                console.log("User stopped talking");
-              }, 2000);
-            },
-          });
-          recorder.current.start();
-        })
-        .catch((err) => console.log(err));
+    for (let i =0 ;  i<input.length; i++){
+      let sample = input[i]*32767;
+      sample = Math.max(-32768,Math.min(32767,sample))
+      view.setInt16(i*2,sample,true)
     }
+
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send(buffer)
+    }
+   }
+}
+
+socket.onmessage = (message) =>{
+  const  data = JSON.parse(message.data);
+  const newTranscript = data.channel?.alternatives[0]?.transcript;
+
+  if (newTranscript && data.is_final) {
+    setTranscript((prev)=>prev+ ' '+ newTranscript)
+    console.log(newTranscript);
+    
+  }
+}
+
+socket.onerror = (error)=>{
+  console.log(error);
+}
+
+socket.onclose = ()=>{
+  console.log('socket closed');
+  
+}
+
   };
 
   const disconnect = (e) => {
     e.preventDefault();
-    recorder.current.stop();
-    recorder.current = null;
+    if (processorRef.current) {
+      processorRef.current.disconnect()
+    }
+    if (audioContextRef.current) {
+      audioContextRef.current.close()
+    }
+     if (micStreamRef.current) {
+      micStreamRef.current.getTracks().forEach((track) => track.stop());
+    }
+    if (deepgramSocket.current?.readyState === WebSocket.OPEN) {
+      deepgramSocket.current.close()
+    }
+    
     setEnableMic(false);
+    console.log("Recording Stoped");
+    
   };
   return (
     <div className=" -mt-12">
