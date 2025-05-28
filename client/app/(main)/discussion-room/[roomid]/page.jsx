@@ -37,6 +37,12 @@ function DiscussionRoom() {
 
   const connectToServer = () => {
     setEnableMic(true);
+
+    const apiKey = process.env.NEXT_PUBLIC_DEEPGRAM_API_KEY;
+    const socket = `wss://api.deepgram.com/v1/listen?punctuate=true&language=en-US&encoding=linear16&sample_rate=16000`;
+    
+
+
     if (typeof window !== "undefined" && typeof navigator !== "undefined") {
       navigator.mediaDevices
         .getUserMedia({ audio: true })
