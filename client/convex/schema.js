@@ -15,4 +15,8 @@ export default defineSchema({
         expertName:v.string(),
         conversation:v.optional(v.any())
     })
+    ,ChatSection :defineTable({
+        sendChat:v.string(),
+        recieveChat:v.optional(v.string())
+    })
 })

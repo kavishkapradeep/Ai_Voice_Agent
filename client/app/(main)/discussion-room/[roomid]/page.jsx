@@ -153,6 +153,7 @@ socket.onclose = ()=>{
         <div>
           <div className="  relative h-[60vh] bg-secondary border rounded-4xl flex flex-col items-center justify-center">
             <h2> Chat Section</h2>
+            <p>{transcript}</p>
           </div>
           <p className=" mt-4 text-gray-400 text-sm">
             At the end of your conversation we will automatically generate
