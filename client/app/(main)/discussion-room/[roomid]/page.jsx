@@ -1,12 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
+import { AIModel } from "@/services/GlobalServices";
 import { CoachingExpert } from "@/services/Option";
 import { UserButton } from "@stackframe/stack";
 import { useQueries, useQuery } from "convex/react";
+import { Loader2Icon } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
+import ChatBox from "./_components/ChatBox";
 
 //const RecordRTC = dynamic(() => import("recordrtc"), { ssr: false });
 function DiscussionRoom() {
@@ -15,11 +18,15 @@ function DiscussionRoom() {
     id: roomid,
   });
   const [expert, setExpert] = useState();
+  const [loading,setLoading] = useState(false)
   const [enableMic, setEnableMic] = useState(false);
   const recorder = useRef(null);
 
 
-  const [transcript,setTranscript] = useState('');
+  const [transcript,setTranscript] = useState([
+    {role:'assistant',content:'HI'},
+    {role:'user',content:'hi'}
+  ]);
 
    const deepgramSocket = useRef(null);
   const processorRef = useRef(null);
@@ -39,6 +46,7 @@ function DiscussionRoom() {
 
   const connectToServer = () => {
     setEnableMic(true);
+    setLoading(true)
 
     const apiKey = process.env.NEXT_PUBLIC_DEEPGRAM_API_KEY;
     const socketUrl = `wss://api.deepgram.com/v1/listen?punctuate=true&language=en-US&encoding=linear16&sample_rate=16000`;
@@ -79,15 +87,27 @@ socket.onopen = async () => {
    }
 }
 
-socket.onmessage = (message) =>{
+socket.onmessage = async (message) =>{
   const  data = JSON.parse(message.data);
   const newTranscript = data.channel?.alternatives[0]?.transcript;
 
   if (newTranscript && data.is_final) {
-    setTranscript((prev)=>prev+ ' '+ newTranscript)
     console.log(newTranscript);
-    
+   const aiResp = await AIModel(
+      DiscussionRoomData.topic,
+      DiscussionRoomData.coachingOption,
+      newTranscript
+    )
+    console.log(aiResp);
+    setTranscript((prev) => [
+  ...prev,
+  { role: "user", content: newTranscript },
+  { role: "assistant", content: aiResp.content || aiResp },
+]);
   }
+
+
+  setLoading(false)
 }
 
 socket.onerror = (error)=>{
@@ -96,13 +116,16 @@ socket.onerror = (error)=>{
 
 socket.onclose = ()=>{
   console.log('socket closed');
-  
 }
 
   };
 
-  const disconnect = (e) => {
+  const disconnect = async (e) => {
     e.preventDefault();
+    setLoading(true)
+
+    
+
     if (processorRef.current) {
       processorRef.current.disconnect()
     }
@@ -118,7 +141,7 @@ socket.onclose = ()=>{
     
     setEnableMic(false);
     console.log("Recording Stoped");
-    
+    setLoading(false)
   };
   return (
     <div className=" -mt-12">
@@ -142,23 +165,17 @@ socket.onclose = ()=>{
           </div>
           <div className=" mt-5 flex items-center justify-center">
             {!enableMic ? (
-              <Button onClick={connectToServer}>Connect</Button>
+              <Button disabled={loading} onClick={connectToServer}>{loading &&  <Loader2Icon className=" animate-spin"/>}Connect</Button>
             ) : (
-              <Button variant="destructive" onClick={disconnect}>
+              <Button disabled={loading} variant="destructive" onClick={disconnect}>
+                {loading &&  <Loader2Icon className=" animate-spin"/>} 
                 Disconnect
               </Button>
             )}
           </div>
         </div>
         <div>
-          <div className="  relative h-[60vh] bg-secondary border rounded-4xl flex flex-col items-center justify-center">
-            <h2> Chat Section</h2>
-            <p>{transcript}</p>
-          </div>
-          <p className=" mt-4 text-gray-400 text-sm">
-            At the end of your conversation we will automatically generate
-            feedback/notes
-          </p>
+         <ChatBox  transcript={transcript}/>
         </div>
       </div>
     </div>
