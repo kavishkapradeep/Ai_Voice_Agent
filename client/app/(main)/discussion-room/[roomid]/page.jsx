@@ -20,6 +20,10 @@ function DiscussionRoom() {
   const [expert, setExpert] = useState();
   const [enableMic, setEnableMic] = useState(false);
   const recorder = useRef(null);
+
+
+  const [transcript,setTranscript] = useState('');
+
   let silenceTimeout;
   useEffect(() => {
     if (DiscussionRoomData) {
@@ -37,11 +41,10 @@ function DiscussionRoom() {
       navigator.mediaDevices
         .getUserMedia({ audio: true })
         .then((stream) => {
-          recorder.current = new RecordRTC(stream, {
+          recorder.current = new MediaRecorder(stream, {
             type: "audio",
             mimeType: "audio/webm;codecs=pcm",
-            recorderType: RecordRTC.StereoAudioRecorder,
-            timeSlice: 250,
+    timeSlice: 250,
             desiredSampRate: 16000,
             numberOfAudioChannels: 1,
             bufferSize: 4096,
@@ -57,7 +60,7 @@ function DiscussionRoom() {
               }, 2000);
             },
           });
-          recorder.current.startRecording();
+          recorder.current.start();
         })
         .catch((err) => console.log(err));
     }
@@ -65,7 +68,7 @@ function DiscussionRoom() {
 
   const disconnect = (e) => {
     e.preventDefault();
-    recorder.current.pauseRecording();
+    recorder.current.stop();
     recorder.current = null;
     setEnableMic(false);
   };
