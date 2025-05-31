@@ -31,3 +31,18 @@ export const AIModel = async (topic ,coachingOption,msg) => {
     return completion.choices[0].message
 }
 
+
+export const AIModelToGeneratedFeedbackAndNotes = async (coachingOption,msg) => {
+
+    const option = ExpertsList.find((item)=>item.name == coachingOption)
+    const PROMPT = (option.summeryPromt);
+
+    const completion = await openai.chat.completions.create({
+        model:'google/gemma-3-12b-it:free',
+        messages:[
+            {role:'assistant',content:PROMPT},
+
+        ]
+    })
+    return completion.choices[0].message
+}

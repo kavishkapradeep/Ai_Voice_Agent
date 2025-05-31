@@ -21,6 +21,7 @@ function DiscussionRoom() {
   const [expert, setExpert] = useState();
   const [loading,setLoading] = useState(false)
   const [enableMic, setEnableMic] = useState(false);
+  const  [enableFeedback,setEnableFeedback] = useState(false)
   const recorder = useRef(null);
 
  const UpdateConversation = useMutation(api.DiscussionRoom.UpdateConversation)
@@ -162,6 +163,7 @@ socket.onclose = ()=>{
     setEnableMic(false);
     console.log("Recording Stoped");
     setLoading(false)
+    setEnableFeedback(true)
   };
   return (
     <div className=" -mt-12">
@@ -195,7 +197,8 @@ socket.onclose = ()=>{
           </div>
         </div>
         <div>
-         <ChatBox  transcript={transcript}/>
+         <ChatBox  transcript={transcript} enableFeedback={enableFeedback}
+         coachingOption={DiscussionRoomData?.coachingOption}/>
         </div>
       </div>
     </div>

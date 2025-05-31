@@ -2,6 +2,7 @@ import { StackProvider, StackTheme } from "@stackframe/stack";
 import { stackServerApp } from "../stack";
 import "./globals.css";
 import Provider from "./Provider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata = {
   title:'Create Next App',
@@ -16,6 +17,7 @@ export default function RootLayout({ children }) {
           <StackTheme>
         <Provider>
         {children}
+        <Toaster/>
         </Provider>
       </StackTheme></StackProvider></body>
     </html>
