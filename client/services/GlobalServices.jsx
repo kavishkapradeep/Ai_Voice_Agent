@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import { ExpertsList } from "./Option";
 
 
+
 export const getToken = async () => {
     const result = await  axios.get('/api/getToken');
      return result.data.token;
@@ -29,3 +30,4 @@ export const AIModel = async (topic ,coachingOption,msg) => {
     })
     return completion.choices[0].message
 }
+

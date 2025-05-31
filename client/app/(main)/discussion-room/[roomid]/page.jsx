@@ -1,15 +1,16 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
-import { AIModel } from "@/services/GlobalServices";
+import { AIModel, textToSpeech } from "@/services/GlobalServices";
 import { CoachingExpert } from "@/services/Option";
 import { UserButton } from "@stackframe/stack";
-import { useQueries, useQuery } from "convex/react";
+import { useMutation, useQueries, useQuery } from "convex/react";
 import { Loader2Icon } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import ChatBox from "./_components/ChatBox";
+import axios from "axios";
 
 //const RecordRTC = dynamic(() => import("recordrtc"), { ssr: false });
 function DiscussionRoom() {
@@ -22,7 +23,7 @@ function DiscussionRoom() {
   const [enableMic, setEnableMic] = useState(false);
   const recorder = useRef(null);
 
-
+ const UpdateConversation = useMutation(api.DiscussionRoom.UpdateConversation)
   const [transcript,setTranscript] = useState([
     {role:'assistant',content:'HI'},
     {role:'user',content:'hi'}
@@ -39,7 +40,7 @@ function DiscussionRoom() {
       const Expert = CoachingExpert.find(
         (item) => item.name === DiscussionRoomData.expertName
       );
-      console.log(Expert);
+     
       setExpert(Expert);
     }
   }, [DiscussionRoomData]);
@@ -93,6 +94,12 @@ socket.onmessage = async (message) =>{
 
   if (newTranscript && data.is_final) {
     console.log(newTranscript);
+    // let voice;
+    //     if(DiscussionRoomData.expertName == 'Micheal'){
+    //         voice ="JBFqnCBsd6RMkjVDRZzb"
+    //     }else{
+    //          voice="Ps8lsQuJKZHMxxDU1tff"
+    //     }
    const aiResp = await AIModel(
       DiscussionRoomData.topic,
       DiscussionRoomData.coachingOption,
@@ -104,6 +111,15 @@ socket.onmessage = async (message) =>{
   { role: "user", content: newTranscript },
   { role: "assistant", content: aiResp.content || aiResp },
 ]);
+
+    const response =  await  axios.post('/api/speechText',{
+      text:aiResp.content 
+    },{responseType:'blob'})
+
+    const audioUrl = URL.createObjectURL(response.data)
+    const audioElement = new Audio(audioUrl)
+    audioElement.play()
+
   }
 
 
@@ -138,7 +154,11 @@ socket.onclose = ()=>{
     if (deepgramSocket.current?.readyState === WebSocket.OPEN) {
       deepgramSocket.current.close()
     }
-    
+
+    await UpdateConversation({
+      id:DiscussionRoomData._id,
+      conversation:transcript
+    })
     setEnableMic(false);
     console.log("Recording Stoped");
     setLoading(false)
