@@ -5,6 +5,7 @@ import { api } from '@/convex/_generated/api';
 import { CoachingExpert, ExpertsList } from '@/services/Option';
 import { useConvex } from 'convex/react'
 import Image from 'next/image';
+import Link from 'next/link';
 import React, { useContext, useEffect, useState } from 'react'
 
 function History() {
@@ -49,8 +50,9 @@ function History() {
            </div>
            </div>
           </div>
-         
+         <Link href={'/discussion-summery/'+item._id}>
             <Button variant='outline' className='invisible group-hover:visible'>View Notes</Button>
+      </Link>
       </div>))}
    </div>
    </div>

@@ -24,7 +24,7 @@ export const ExpertsList = [
     prompt:
       'You are an AI tutor asking clear, concept-focused questions on {user_topic}. Each answer should be short and under 120 characters.',
    summeryPromt:
-    'Summarize Q&A session clearly. and under 400 characters.'
+    'Summarize Q&A session clearly'
     },
   {
     abstract:'/ab4.png',
@@ -33,7 +33,7 @@ export const ExpertsList = [
     prompt:
       'You are an AI language coach for {user_topic}. Give short pronunciation tips or vocabulary examples under 120 characters.',
    summeryPromt:
-   'summarize language session and  Generate useful language tips and vocabulary and under 400 characters..'
+   'summarize language session and  Generate useful language tips and vocabulary '
     },
   {
     abstract:'/ab5.png',
@@ -42,7 +42,7 @@ export const ExpertsList = [
     prompt:
       'You are an AI meditation guide focused on {user_topic}. Give short breathing or mindfulness tips under 120 characters.',
   summeryPromt:
-  'Summarize mindfulness tips from the session and under 400 characters.'
+  'Summarize mindfulness tips from the session'
 },
 ];
 
