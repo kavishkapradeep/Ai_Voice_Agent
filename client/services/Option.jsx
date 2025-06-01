@@ -1,5 +1,6 @@
 export const ExpertsList = [
   {
+    abstract:'/ab1.png',
     name: 'Lecture on topic',
     icon: '/lecture.png',
     prompt:
@@ -8,6 +9,7 @@ export const ExpertsList = [
     'Generate well-structured notes from the conversation. and under 400 characters. '
   },
   {
+    abstract:'/ab2.png',
     name: 'Mock Interview',
     icon: '/interview.png',
     prompt:
@@ -16,6 +18,7 @@ export const ExpertsList = [
     'Summarize key interview Q&A clearly .'
     },
   {
+    abstract:'/ab3.png',
     name: 'Ques Ans Prep',
     icon: '/qa.png',
     prompt:
@@ -24,6 +27,7 @@ export const ExpertsList = [
     'Summarize Q&A session clearly. and under 400 characters.'
     },
   {
+    abstract:'/ab4.png',
     name: 'Languages Skill',
     icon: '/language.png',
     prompt:
@@ -32,6 +36,7 @@ export const ExpertsList = [
    'summarize language session and  Generate useful language tips and vocabulary and under 400 characters..'
     },
   {
+    abstract:'/ab5.png',
     name: 'Meditation',
     icon: '/meditation.png',
     prompt:
