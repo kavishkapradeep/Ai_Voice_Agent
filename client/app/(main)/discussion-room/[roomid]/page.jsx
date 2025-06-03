@@ -8,9 +8,10 @@ import { useMutation, useQueries, useQuery } from "convex/react";
 import { Loader2Icon } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import ChatBox from "./_components/ChatBox";
 import axios from "axios";
+import { UserContext } from "@/app/_context/UserContext";
 
 //const RecordRTC = dynamic(() => import("recordrtc"), { ssr: false });
 function DiscussionRoom() {
@@ -22,10 +23,13 @@ function DiscussionRoom() {
   const [loading,setLoading] = useState(false)
   const [enableMic, setEnableMic] = useState(false);
   const  [enableFeedback,setEnableFeedback] = useState(false)
+  const [userData,setUserData] = useContext(UserContext)
   const recorder = useRef(null);
 
  const UpdateConversation = useMutation(api.DiscussionRoom.UpdateConversation)
-  const [transcript,setTranscript] = useState([
+ const updateUserToken = useMutation(api.users.UpdateUserToken)
+
+ const [transcript,setTranscript] = useState([
     {role:'assistant',content:'HI'},
     {role:'user',content:'hi'}
   ]);
@@ -121,6 +125,8 @@ socket.onmessage = async (message) =>{
     const audioElement = new Audio(audioUrl)
     audioElement.play()
 
+   await   updateUserTokenMethod(newTranscript)
+
   }
 
 
@@ -165,6 +171,22 @@ socket.onclose = ()=>{
     setLoading(false)
     setEnableFeedback(true)
   };
+
+const updateUserTokenMethod = async (text) => {
+  const  tokenCount = text.trim()?text.trim().split(/\s+/).length:0   
+  const result = await updateUserToken({
+    id:userData._id,
+    credits:Number  (userData.credits) - Number(tokenCount)
+  }) 
+
+  setUserData(prev=>({
+    ...prev,
+    credits:Number  (userData.credits) - Number(tokenCount)
+  }))
+}
+
+
+
   return (
     <div className=" -mt-12">
       <h2 className=" text-lg font-bold">

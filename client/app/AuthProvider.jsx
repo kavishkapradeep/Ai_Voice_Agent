@@ -30,7 +30,7 @@ setUserData(result)
   },[user])
     return (
     <div>
-      <UserContext.Provider value={{userData,setUserData}}>
+      <UserContext.Provider value={[userData,setUserData]}>
       {children  }
       </UserContext.Provider>
     </div>
