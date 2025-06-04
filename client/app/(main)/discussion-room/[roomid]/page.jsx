@@ -12,6 +12,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import ChatBox from "./_components/ChatBox";
 import axios from "axios";
 import { UserContext } from "@/app/_context/UserContext";
+import Webcam from "react-webcam";
 
 //const RecordRTC = dynamic(() => import("recordrtc"), { ssr: false });
 function DiscussionRoom() {
@@ -23,7 +24,8 @@ function DiscussionRoom() {
   const [loading,setLoading] = useState(false)
   const [enableMic, setEnableMic] = useState(false);
   const  [enableFeedback,setEnableFeedback] = useState(false)
-  const [userData,setUserData] = useContext(UserContext)
+  const {userData} = useContext(UserContext)
+  const [camera,setCamera] = useState(false)
   const recorder = useRef(null);
 
  const UpdateConversation = useMutation(api.DiscussionRoom.UpdateConversation)
@@ -173,7 +175,7 @@ socket.onclose = ()=>{
   };
 
 const updateUserTokenMethod = async (text) => {
-  const  tokenCount = text.trim()?text.trim().split(/\s+/).length:0   
+  const  tokenCount = text.trim()?text.trim().split (/\s+/).length:0   
   const result = await updateUserToken({
     id:userData._id,
     credits:Number  (userData.credits) - Number(tokenCount)
@@ -185,7 +187,9 @@ const updateUserTokenMethod = async (text) => {
   }))
 }
 
-
+const cameraOn = async () => {
+  setCamera(!camera)
+}
 
   return (
     <div className=" -mt-12">
@@ -203,8 +207,15 @@ const updateUserTokenMethod = async (text) => {
               className=" h-[80px] w-[80px] animate-pulse rounded-full object-cover"
             />
             <h2 className=" text-gray-500">{expert?.name}</h2>
-            <div className=" absolute bottom-10 right-10 px-10 p-5 rounded-lg bg-gray-200">
+            <div className=" absolute bottom-10 right-10   rounded-lg bg-gray-200">
+            {!camera ?<div className=" px-10 p-6 border rounded-xl ">
               <UserButton />
+           </div>:
+            <Webcam height={170} width={170} className="rounded-2xl"/> 
+            } </div>
+          <Button onClick={cameraOn} className=' text-sm mt-2 absolute bottom-1 right-8' variant='outline'>turn {!camera?"on":"off"} camera</Button>
+            <div>
+             
             </div>
           </div>
           <div className=" mt-5 flex items-center justify-center">

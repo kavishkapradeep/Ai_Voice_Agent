@@ -6,6 +6,7 @@ import { useUser } from "@stackframe/stack";
 import Image from "next/image";
 import React from "react";
 import UserinputDialog from "./UserinputDialog";
+import ProfileDialog from "./ProfileDialog";
 
 function FeatureAssistant() {
   const user = useUser();
@@ -18,7 +19,9 @@ function FeatureAssistant() {
             Welcome back,{user?.displayName}
           </h2>
         </div>
+        <ProfileDialog>
         <Button>Profile</Button>
+        </ProfileDialog>
       </div>
       <div className=" grid grid-cols-2  lg:grid-cols-5 xl:grid-cols-5 mt-10 gap-5">
         {ExpertsList.map((option,index)=>(
