@@ -21,15 +21,8 @@ export default function PaymentPage(){
     const options = {
         clientSecret,
         appearance:{
-             theme: 'none', // No predefined theme
-    variables: {
-      colorPrimary: '#1d72b8', // Custom primary color
-      colorBackground: '#f7f7f7', // Light background color
-      colorText: '#333333', // Dark text
-      colorInputBackground: '#ffffff', // Input field background
-      colorInputBorder: '#cccccc', // Input field border
-      colorDanger: '#d9534f'
-    }}
+             theme: 'stripe', // No predefined theme
+        }
     }
 
     if(!clientSecret) return <div>Loading ...</div>

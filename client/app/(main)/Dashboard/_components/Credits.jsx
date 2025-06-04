@@ -2,14 +2,16 @@ import { UserContext } from '@/app/_context/UserContext'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { useUser } from '@stackframe/stack'
+import { loadStripe } from '@stripe/stripe-js'
 import { Wallet2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 
 function Credits() {
 
   const {userData} =useContext(UserContext)
+  const [loading,setLoading] = useState(false)
 
   const CalculateProgress = ()=>{
       if (userData?.subscriptionId) {
@@ -18,7 +20,58 @@ function Credits() {
             return (Number(userData.credits)/5000)*100
       }
   }
-  
+
+  const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+
+const handlePayment = async () => {
+  setLoading(true);
+
+  try {
+    const response = await fetch('/api/payment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: 10
+      }),
+    });
+
+    const text = await response.text();
+
+    if (!text) {
+      throw new Error('Empty response from server');
+    }
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (jsonError) {
+      console.error('Invalid JSON returned:', text);
+      throw new Error('Invalid response from payment server');
+    }
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Something went wrong with payment.');
+    }
+
+    const { sessionId } = data;
+    if (!sessionId) {
+      throw new Error('No session ID returned from server');
+    }
+
+    const stripe = await stripePromise;
+    await stripe.redirectToCheckout({ sessionId:data.sessionId });
+
+  } catch (error) {
+    console.log('Payment error:', error.message);
+    alert(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
   const user = useUser()
   return (
     <div>
@@ -49,9 +102,8 @@ function Credits() {
                  <h2 className=' font-bold'>$10/Month</h2>
                </div>
                <hr  className=' my-3'/>
-               <Link href={'/paymentForume'}>
-               <Button className='w-full'><Wallet2/> Upgrade 10$</Button>
-             </Link>
+               <Button onClick={handlePayment} className='w-full'><Wallet2/> Upgrade 10$</Button>
+
              </div>
           </div>
        
