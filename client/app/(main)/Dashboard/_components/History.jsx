@@ -23,7 +23,7 @@ function History() {
       uid:userData?._id
     })
     setDiscussionRoomList(result)
-    console.log(result);
+    
   }
 
   const GetAbstractImage = (option)=>{

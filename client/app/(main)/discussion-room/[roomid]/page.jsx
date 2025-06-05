@@ -24,7 +24,7 @@ function DiscussionRoom() {
   const [loading,setLoading] = useState(false)
   const [enableMic, setEnableMic] = useState(false);
   const  [enableFeedback,setEnableFeedback] = useState(false)
-  const {userData} = useContext(UserContext)
+  const {userData,setUserData} = useContext(UserContext)
   const [camera,setCamera] = useState(false)
   const recorder = useRef(null);
 

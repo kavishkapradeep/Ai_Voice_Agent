@@ -37,3 +37,17 @@ export const UpdateUserToken =  mutation({
     })
   }
 })
+
+export const UpdatePaymentUserToken =  mutation({
+  args:{
+    id:v.id('users'),
+    credits:v.number(),
+    subscriptionId:v.string()
+  },
+  handler:async (ctx,args) => {
+    await ctx.db.patch(args.id,{
+        credits:args.credits,
+        subscriptionId:args.subscriptionId
+    })
+  }
+})

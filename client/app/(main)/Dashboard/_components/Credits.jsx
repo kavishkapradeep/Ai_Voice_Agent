@@ -6,7 +6,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Wallet2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 function Credits() {
 
@@ -71,6 +71,9 @@ const handlePayment = async () => {
   }
 };
 
+useEffect(()=>{
+ CalculateProgress()
+ },[userData])
 
   const user = useUser()
   return (
