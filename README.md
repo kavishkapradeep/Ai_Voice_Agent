@@ -30,13 +30,10 @@ Meditation to ease your mind before interviews
 
 AI-driven feedback from your sessions!
 
-🖼️ Here’s a preview of the workspace UI (built with ShadCN + modern design principles) 👇
-[Insert the image or carousel of images here]
-
 💡 The goal was to create a seamless learning and self-improvement space enhanced by AI capabilities.
 
 📌 Tech Stack:
-Next.js, Shadcn UI, Convex, Deepgram, Recl AI, OpenRouter, TypeScript
+Next.js, Shadcn UI, Convex, Deepgram, Rev AI, OpenRouter, TypeScript
 
 👉 If you're interested in how AI can transform learning or want to collaborate, feel free to connect!
 
